@@ -1,0 +1,6 @@
+{
+  "parent": "mgrr:custom/hfb",
+  "textures": {
+    "1": "mgrr:item/high_frequency_blade"
+  }
+}
