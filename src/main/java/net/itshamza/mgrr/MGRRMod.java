@@ -2,6 +2,9 @@ package net.itshamza.mgrr;
 
 import com.mojang.logging.LogUtils;
 import net.itshamza.mgrr.entity.ModEntityCreator;
+import net.itshamza.mgrr.item.ModItems;
+import net.itshamza.mgrr.item.ModTabs;
+import net.itshamza.mgrr.network.NetworkCore;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -17,30 +20,21 @@ public class MGRRMod
 {
     public static final String MOD_ID = "mgrr";
     private static final Logger LOGGER = LogUtils.getLogger();
-    public MGRRMod()
-    {
+    public MGRRMod() {
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
-
+        //
+        ModItems.register(modEventBus);
+        //
         modEventBus.addListener(this::commonSetup);
-
         ModEntityCreator.register(modEventBus);
-
         MinecraftForge.EVENT_BUS.register(this);
     }
-
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        NetworkCore.register();
     }
-
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
     @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD)
-    public static class ClientModEvents
-    {
+    public static class ClientModEvents {
         @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-
-        }
+        public static void onClientSetup(FMLClientSetupEvent event){}
     }
 }
