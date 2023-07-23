@@ -7,7 +7,6 @@ import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
@@ -18,6 +17,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
 import software.bernie.geckolib3.core.PlayState;
@@ -30,7 +30,7 @@ import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 public class CyborgEntity extends Monster implements IAnimatable {
 
-    private AnimationFactory factory = new AnimationFactory(this);
+    private final AnimationFactory factory = new AnimationFactory(this);
 
     private static final EntityDataAccessor<Boolean> BLOCKING = SynchedEntityData.defineId(CyborgEntity.class, EntityDataSerializers.BOOLEAN);
 
@@ -56,13 +56,13 @@ public class CyborgEntity extends Monster implements IAnimatable {
         this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
         this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
         this.goalSelector.addGoal(5, new BlockGoal(this));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, (double)1.2F, true));
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2F, true));
         this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, false));
     }
 
     // ANIMATIONS //
 
-    protected void playStepSound(BlockPos pos, BlockState blockIn) {
+    protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockIn) {
         this.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 0.15F, 1.0F);
     }
 
@@ -99,7 +99,7 @@ public class CyborgEntity extends Monster implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-    private PlayState attackPredicate(AnimationEvent event) {
+    private PlayState attackPredicate(AnimationEvent<CyborgEntity> event) {
         if(this.swinging && event.getController().getAnimationState().equals(AnimationState.Stopped)){
             event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("attack", false));
@@ -108,7 +108,7 @@ public class CyborgEntity extends Monster implements IAnimatable {
         return PlayState.CONTINUE;
     }
 
-    private PlayState deathPredicate(AnimationEvent event) {
+    private PlayState deathPredicate(AnimationEvent<CyborgEntity> event) {
         if(this.isDeadOrDying() && event.getController().getAnimationState().equals(AnimationState.Stopped)){
             event.getController().markNeedsReload();
             event.getController().setAnimation(new AnimationBuilder().addAnimation("death", false));
@@ -118,11 +118,11 @@ public class CyborgEntity extends Monster implements IAnimatable {
 
     @Override
     public void registerControllers(AnimationData data) {
-        data.addAnimationController(new AnimationController(this, "controller",
+        data.addAnimationController(new AnimationController<>(this, "controller",
                 0, this::predicate));
-        data.addAnimationController(new AnimationController(this, "attackController",
+        data.addAnimationController(new AnimationController<>(this, "attackController",
                 0, this::attackPredicate));
-        data.addAnimationController(new AnimationController(this, "deathController",
+        data.addAnimationController(new AnimationController<>(this, "deathController",
                 0, this::deathPredicate));
     }
 
@@ -133,8 +133,8 @@ public class CyborgEntity extends Monster implements IAnimatable {
 
     protected void defineSynchedData() {
         super.defineSynchedData();
-        this.entityData.define(BLOCKING, Boolean.valueOf(false));
-        this.entityData.define(SPOTTED, Boolean.valueOf(false));
+        this.entityData.define(BLOCKING, Boolean.FALSE);
+        this.entityData.define(SPOTTED, Boolean.FALSE);
     }
 
     public void addAdditionalSaveData(CompoundTag p_29495_) {
@@ -142,25 +142,25 @@ public class CyborgEntity extends Monster implements IAnimatable {
         p_29495_.putBoolean("Spotted", isSpotted());
     }
 
-    public void readAdditionalSaveData(CompoundTag p_29478_) {
+    public void readAdditionalSaveData(@NotNull CompoundTag p_29478_) {
         super.readAdditionalSaveData(p_29478_);
         this.setBlocking(p_29478_.getBoolean("Blocking"));
         this.setSpotted(p_29478_.getBoolean("Spotted"));
     }
 
     public boolean isBlocking() {
-        return this.entityData.get(BLOCKING).booleanValue();
+        return this.entityData.get(BLOCKING);
     }
 
     public void setBlocking(boolean blocking) {
-        this.entityData.set(BLOCKING, Boolean.valueOf(blocking));
+        this.entityData.set(BLOCKING, blocking);
     }
 
     public boolean isSpotted() {
-        return this.entityData.get(SPOTTED).booleanValue();
+        return this.entityData.get(SPOTTED);
     }
 
     public void setSpotted(boolean blocking) {
-        this.entityData.set(SPOTTED, Boolean.valueOf(blocking));
+        this.entityData.set(SPOTTED, blocking);
     }
 }

@@ -20,12 +20,16 @@ public class ModEntityCreator {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
             DeferredRegister.create(ForgeRegistries.ENTITY_TYPES, MGRRMod.MOD_ID);
 
-    // REGESTRIES
+    // REGISTRIES
 
-    public static final RegistryObject<EntityType<CyborgEntity>> CYBORG = ENTITY_TYPES.register("cyborg", () -> EntityType.Builder.of(CyborgEntity::new, MobCategory.MONSTER).sized(0.7F, 2F).build(new ResourceLocation(MGRRMod.MOD_ID, "cyborg").toString()));
+    public static final RegistryObject<EntityType<CyborgEntity>> CYBORG = ENTITY_TYPES.register("cyborg",
+            () -> EntityType.Builder.of(CyborgEntity::new, MobCategory.MONSTER).sized(0.7F, 2F)
+                    .build(new ResourceLocation(MGRRMod.MOD_ID, "cyborg").toString()));
+
     // ATTRIBUTES
 
     @SubscribeEvent
+    @SuppressWarnings("unused")
     public static void entityAttributeEvent(EntityAttributeCreationEvent event) {
         event.put(ModEntityCreator.CYBORG.get(), CyborgEntity.setAttributes());
     }
@@ -33,6 +37,7 @@ public class ModEntityCreator {
     // RENDERERS
 
     @SubscribeEvent
+    @SuppressWarnings("unused")
     public static void registerEntityRenderers(final EntityRenderersEvent.RegisterRenderers event) {
         event.registerEntityRenderer(ModEntityCreator.CYBORG.get(), CyborgRenderer::new);
     }
