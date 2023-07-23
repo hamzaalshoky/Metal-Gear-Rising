@@ -13,11 +13,13 @@ public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, MGRRMod.MOD_ID);
     // weapons
-    public static final RegistryObject<Item> HIGH_FREQUENCY_BLADE = ITEMS.register("high_frequency_blade", HighFrequencyBladeItem::new);
+    public static final RegistryObject<Item> HIGH_FREQUENCY_BLADE = ITEMS.register("high_frequency_blade",
+            HighFrequencyBladeItem::new);
+
     // spawn eggs
     public static final RegistryObject<Item> CYBORG_SPAWN_EGG = ITEMS.register("cyborg_spawn_egg",
-                () -> new ForgeSpawnEggItem(ModEntityCreator.CYBORG,14265190, 1973794,
-                        new Item.Properties()));
+                () -> new ForgeSpawnEggItem(ModEntityCreator.CYBORG,11840667, 9466717,
+                        new Item.Properties().m_41491_(ModTabs.MGRR_TAB)));
    public static void register(IEventBus eventBus) {
         ITEMS.register(eventBus);
     }

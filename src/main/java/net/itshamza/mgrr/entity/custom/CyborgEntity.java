@@ -1,5 +1,6 @@
 package net.itshamza.mgrr.entity.custom;
 
+import net.itshamza.mgrr.effect.ModEffects;
 import net.itshamza.mgrr.entity.custom.ai.BlockGoal;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -8,6 +9,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.*;
@@ -17,6 +19,7 @@ import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -51,13 +54,27 @@ public class CyborgEntity extends Monster implements IAnimatable {
 
     protected void registerGoals() {
         this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0D));
-        this.goalSelector.addGoal(2, new RandomSwimmingGoal(this,1.0D, 1));
-        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F));
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this));
-        this.goalSelector.addGoal(5, new BlockGoal(this));
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2F, true));
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, false));
+        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0D){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.goalSelector.addGoal(2, new RandomSwimmingGoal(this,1.0D, 1){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.goalSelector.addGoal(5, new BlockGoal(this){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2F, true){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
+        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, false){
+            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
+        });
     }
 
     // ANIMATIONS //
@@ -129,6 +146,26 @@ public class CyborgEntity extends Monster implements IAnimatable {
     @Override
     public AnimationFactory getFactory() {
         return factory;
+    }
+
+    public void tick(){
+        super.tick();
+        if(CyborgEntity.this.hasEffect(ModEffects.STUN.get())){
+            CyborgEntity.this.setDeltaMovement(0, 0, 0);
+            // Stop the entity from moving or doing anything
+            CyborgEntity.this.setDeltaMovement(0, 0, 0);
+            CyborgEntity.this.setJumping(false);
+            CyborgEntity.this.setSprinting(false);
+            CyborgEntity.this.setShiftKeyDown(false);
+            CyborgEntity.this.setYHeadRot(0);
+            CyborgEntity.this.setXRot(0);
+
+
+            // Prevent the entity from attacking
+            if (CyborgEntity.this instanceof Mob) {
+                ((Mob) CyborgEntity.this).setTarget(null);
+            }
+        }
     }
 
     protected void defineSynchedData() {

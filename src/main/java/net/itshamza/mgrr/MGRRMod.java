@@ -1,6 +1,7 @@
 package net.itshamza.mgrr;
 
 import com.mojang.logging.LogUtils;
+import net.itshamza.mgrr.effect.ModEffects;
 import net.itshamza.mgrr.entity.ModEntityCreator;
 import net.itshamza.mgrr.item.ModItems;
 import net.itshamza.mgrr.item.ModTabs;
@@ -27,6 +28,7 @@ public class MGRRMod
         //
         modEventBus.addListener(this::commonSetup);
         ModEntityCreator.register(modEventBus);
+        ModEffects.register(modEventBus);
         MinecraftForge.EVENT_BUS.register(this);
     }
     private void commonSetup(final FMLCommonSetupEvent event) {
