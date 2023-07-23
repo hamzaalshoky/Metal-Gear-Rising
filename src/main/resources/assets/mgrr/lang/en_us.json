@@ -1,0 +1,18 @@
+{
+  "---ITEMS---": "",
+  "item.mgrr.high_frequency_blade": "High Frequency Blade",
+  "item.mgrr.cyborg_spawn_egg": "Cyborg Spawn Egg",
+
+  "---DESCRIPTION---": "",
+  "desc.mgrr.general_parry": "Able to parry",
+
+  "---BLOCKS---": "",
+
+  "---ENTITIES---": "",
+  "entity.mgrr.cyborg": "Cyborg",
+
+  "---DAMAGE SOURCES---": "",
+  "death.attack.parry.high_frequency_blade": "%1$s experienced %2$s's blade high frequencies'",
+
+  "": ""
+}
