@@ -9,8 +9,6 @@ public class StunEffect extends MobEffect {
     public StunEffect() {
         super(MobEffectCategory.HARMFUL, 0xFFFFFF);
     }
-
-    // Override the applyEffectTick method to apply the stun effect
     @Override
     public void applyEffectTick(LivingEntity entity, int amplifier) {
         // Stun the entity by setting their motion to zero
@@ -22,8 +20,6 @@ public class StunEffect extends MobEffect {
         entity.setShiftKeyDown(false);
         entity.setYHeadRot(0);
         entity.setXRot(0);
-
-
         // Prevent the entity from attacking
         if (entity instanceof Mob) {
             ((Mob) entity).setTarget(null);

@@ -34,13 +34,14 @@ public class ParryEffect {
             for (LivingEntity entity : ModEntityUtils.entityCollector(new Vec3(lx, ly, lz), 2, player.level)) {
                 event.setCanceled(true);
                 if (!entity.equals(player) && !entity.equals(event.getSource().getDirectEntity())) {
+                    // this applies for all mobs within 2 by 2 by 2 area before the player excluding the player and the original attacker
                     level.sendParticles(ParticleTypes.SWEEP_ATTACK, entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ(), 1, 0, 0, 0, 0);
                     level.sendParticles(ParticleTypes.CRIT, entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ(), 1, 0, 0, 0, 0);
-                    // Apply stun effect to the entity being parried
-                    entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 2400, 1));
-                } else if (entity.equals(event.getSource().getDirectEntity())) {
+                    entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 1200, 1));
+                } else if (!entity.equals(player) && entity.equals(event.getSource().getEntity())) { // nikgub : this works on a direct attacker, thus effect shall be stronger
                     level.sendParticles(ParticleTypes.CRIT, entity.getX(), entity.getY() + entity.getBbHeight() / 2, entity.getZ(), 1, 0, 0, 0, 0);
-                    level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.GENERIC_EXPLODE, SoundSource.PLAYERS, 5, Mth.nextFloat(RandomSource.create(), 0.8f, 1.2f));
+                    level.playSound(player, player.getX(), player.getY(), player.getZ(), SoundEvents.METAL_HIT, SoundSource.PLAYERS, 5, Mth.nextFloat(RandomSource.create(), 0.8f, 1.2f));
+                    level.playLocalSound(player.getX(), player.getY(), player.getZ(), SoundEvents.METAL_HIT, SoundSource.PLAYERS, 5, 1, true);
                     entity.addEffect(new MobEffectInstance(ModEffects.STUN.get(), 2400, 1));
                 }
             }

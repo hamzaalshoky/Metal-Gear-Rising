@@ -1,5 +1,6 @@
 package net.itshamza.mgrr.entity;
 
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
@@ -11,6 +12,10 @@ import java.util.List;
 public class ModEntityUtils {
     public static List<? extends LivingEntity> entityCollector(Vec3 center, double radius, Level level){
         return level.getEntitiesOfClass(LivingEntity.class, new AABB(center, center).inflate(radius), e -> true).stream().sorted(Comparator.comparingDouble(
+                entityFound -> entityFound.distanceToSqr(center))).toList();
+    }
+    public static List<? extends Entity> classedEntityCollector(Class<? extends Entity> entityClass, Vec3 center, double radius, Level level){
+        return level.getEntitiesOfClass(entityClass, new AABB(center, center).inflate(radius), e -> true).stream().sorted(Comparator.comparingDouble(
                 entityFound -> entityFound.distanceToSqr(center))).toList();
     }
 }
