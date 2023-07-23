@@ -1,6 +1,6 @@
 package net.itshamza.mgrr.entity.custom.ai;
 
-import net.itshamza.mgrr.entity.custom.CyborgEntity;
+import net.itshamza.mgrr.entity.MGREntity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.ai.goal.Goal;
 
@@ -8,12 +8,12 @@ import java.util.EnumSet;
 
 public class BlockGoal extends Goal {
 
-    private final CyborgEntity entity;
+    private final MGREntity entity;
     private boolean isBlocking;
     private int blockTime;
 
     // Constructor
-    public BlockGoal(CyborgEntity entity) {
+    public BlockGoal(MGREntity entity) {
         this.entity = entity;
         this.isBlocking = false;
         this.blockTime = 0;
@@ -38,10 +38,7 @@ public class BlockGoal extends Goal {
     @Override
     public boolean canUse() {
         LivingEntity target = this.entity.getTarget();
-        if (target != null && !this.entity.swinging && target.swinging) {
-            return true;
-        }
-        return false;
+        return target != null && !this.entity.swinging && target.swinging;
     }
 
     // Override the tick method

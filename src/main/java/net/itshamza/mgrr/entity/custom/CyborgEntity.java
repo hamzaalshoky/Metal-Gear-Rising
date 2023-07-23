@@ -1,25 +1,18 @@
 package net.itshamza.mgrr.entity.custom;
 
 import net.itshamza.mgrr.effect.ModEffects;
-import net.itshamza.mgrr.entity.custom.ai.BlockGoal;
+import net.itshamza.mgrr.entity.MGREntity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.syncher.EntityDataAccessor;
-import net.minecraft.network.syncher.EntityDataSerializers;
-import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.Mob;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
-import net.minecraft.world.entity.ai.goal.*;
-import net.minecraft.world.entity.ai.goal.target.NearestAttackableTargetGoal;
 import net.minecraft.world.entity.animal.Animal;
 import net.minecraft.world.entity.monster.Monster;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.fml.common.Mod;
 import org.jetbrains.annotations.NotNull;
 import software.bernie.geckolib3.core.AnimationState;
 import software.bernie.geckolib3.core.IAnimatable;
@@ -31,19 +24,11 @@ import software.bernie.geckolib3.core.manager.AnimationData;
 import software.bernie.geckolib3.core.manager.AnimationFactory;
 
 
-public class CyborgEntity extends Monster implements IAnimatable {
-
+public class CyborgEntity extends MGREntity implements IAnimatable {
     private final AnimationFactory factory = new AnimationFactory(this);
-
-    private static final EntityDataAccessor<Boolean> BLOCKING = SynchedEntityData.defineId(CyborgEntity.class, EntityDataSerializers.BOOLEAN);
-
-    private static final EntityDataAccessor<Boolean> SPOTTED = SynchedEntityData.defineId(CyborgEntity.class, EntityDataSerializers.BOOLEAN);
-
     public CyborgEntity(EntityType<? extends Monster> p_27557_, Level p_27558_) {
         super(p_27557_, p_27558_);
     }
-
-
     public static AttributeSupplier setAttributes() {
         return Animal.createMobAttributes()
                 .add(Attributes.MAX_HEALTH, 24.0D)
@@ -51,30 +36,15 @@ public class CyborgEntity extends Monster implements IAnimatable {
                 .add(Attributes.ATTACK_SPEED, 2.0f)
                 .add(Attributes.MOVEMENT_SPEED, 0.25f).build();
     }
-
     protected void registerGoals() {
-        this.goalSelector.addGoal(1, new FloatGoal(this));
-        this.goalSelector.addGoal(2, new RandomStrollGoal(this, 1.0D){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.goalSelector.addGoal(2, new RandomSwimmingGoal(this,1.0D, 1){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.goalSelector.addGoal(3, new LookAtPlayerGoal(this, Player.class, 8.0F){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.goalSelector.addGoal(5, new RandomLookAroundGoal(this){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.goalSelector.addGoal(5, new BlockGoal(this){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.goalSelector.addGoal(1, new MeleeAttackGoal(this, 1.2F, true){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
-        this.targetSelector.addGoal(3, new NearestAttackableTargetGoal<>(this, Player.class, false){
-            public boolean canUse() { return !CyborgEntity.this.hasEffect(ModEffects.STUN.get()) && super.canUse(); }
-        });
+        this.goalSelector.addGoal(1, this.FLOAT_GOAL());
+        this.goalSelector.addGoal(2, this.STROLL_GOAL());
+        this.goalSelector.addGoal(2, this.SWIMMING_GOAL());
+        this.goalSelector.addGoal(3, this.LOOK_AT_ENTITY_GOAL(Player.class));
+        this.goalSelector.addGoal(5, this.RANDOM_LOOK_AROUND());
+        this.goalSelector.addGoal(5, this.BLOCK_GOAL());
+        this.goalSelector.addGoal(1, this.MELEE_ATTACK_GOAL());
+        this.targetSelector.addGoal(3, this.NEAREST_TARGET_GOAL(Player.class));
     }
 
     // ANIMATIONS //
@@ -82,11 +52,9 @@ public class CyborgEntity extends Monster implements IAnimatable {
     protected void playStepSound(@NotNull BlockPos pos, @NotNull BlockState blockIn) {
         this.playSound(SoundEvents.SWEET_BERRY_BUSH_PICK_BERRIES, 0.15F, 1.0F);
     }
-
     protected float getSoundVolume() {
         return 0.2F;
     }
-    
     public <E extends IAnimatable> PlayState predicate(AnimationEvent<E> event) {
         if (event.isMoving()) {
             if (this.isAggressive()) {
@@ -142,12 +110,10 @@ public class CyborgEntity extends Monster implements IAnimatable {
         data.addAnimationController(new AnimationController<>(this, "deathController",
                 0, this::deathPredicate));
     }
-
     @Override
     public AnimationFactory getFactory() {
         return factory;
     }
-
     public void tick(){
         super.tick();
         if(CyborgEntity.this.hasEffect(ModEffects.STUN.get())){
@@ -159,45 +125,22 @@ public class CyborgEntity extends Monster implements IAnimatable {
             CyborgEntity.this.setShiftKeyDown(false);
             CyborgEntity.this.setYHeadRot(0);
             CyborgEntity.this.setXRot(0);
-
-
             // Prevent the entity from attacking
-            if (CyborgEntity.this instanceof Mob) {
-                ((Mob) CyborgEntity.this).setTarget(null);
-            }
+            CyborgEntity.this.setTarget(null);
         }
     }
-
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(BLOCKING, Boolean.FALSE);
         this.entityData.define(SPOTTED, Boolean.FALSE);
     }
-
     public void addAdditionalSaveData(CompoundTag p_29495_) {
         p_29495_.putBoolean("Blocking", isBlocking());
         p_29495_.putBoolean("Spotted", isSpotted());
     }
-
     public void readAdditionalSaveData(@NotNull CompoundTag p_29478_) {
         super.readAdditionalSaveData(p_29478_);
         this.setBlocking(p_29478_.getBoolean("Blocking"));
         this.setSpotted(p_29478_.getBoolean("Spotted"));
-    }
-
-    public boolean isBlocking() {
-        return this.entityData.get(BLOCKING);
-    }
-
-    public void setBlocking(boolean blocking) {
-        this.entityData.set(BLOCKING, blocking);
-    }
-
-    public boolean isSpotted() {
-        return this.entityData.get(SPOTTED);
-    }
-
-    public void setSpotted(boolean blocking) {
-        this.entityData.set(SPOTTED, blocking);
     }
 }
