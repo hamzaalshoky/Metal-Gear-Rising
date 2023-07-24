@@ -90,7 +90,7 @@ public class MGREntity extends Monster {
 
 
     public boolean goalCondition(){
-        return !MGREntity.this.hasEffect(ModEffects.STUN.get());
+        return !MGREntity.this.hasEffect(ModEffects.MALFUNCTION.get());
     }
 
 

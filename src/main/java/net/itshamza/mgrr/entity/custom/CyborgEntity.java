@@ -116,7 +116,7 @@ public class CyborgEntity extends MGREntity implements IAnimatable {
     }
     public void tick(){
         super.tick();
-        if(CyborgEntity.this.hasEffect(ModEffects.STUN.get())){
+        if(CyborgEntity.this.hasEffect(ModEffects.MALFUNCTION.get())){
             CyborgEntity.this.setDeltaMovement(0, 0, 0);
             // Stop the entity from moving or doing anything
             CyborgEntity.this.setDeltaMovement(0, 0, 0);

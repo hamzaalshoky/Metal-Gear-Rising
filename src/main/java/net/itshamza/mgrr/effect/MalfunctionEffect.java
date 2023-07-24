@@ -5,8 +5,8 @@ import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.Mob;
 
-public class StunEffect extends MobEffect {
-    public StunEffect() {
+public class MalfunctionEffect extends MobEffect {
+    public MalfunctionEffect() {
         super(MobEffectCategory.HARMFUL, 0xFFFFFF);
     }
     @Override
